@@ -5,6 +5,7 @@ type User{
     lastName : String
     email  : String!
     profileImageURL : String
-
+    
+    tweets : [Tweet]
 }
 `;
