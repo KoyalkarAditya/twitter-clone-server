@@ -1,5 +1,5 @@
 export const types = `#graphql
-input CreateTweetData{
+input createTweetData{
     content : String!
     imageURL : String
 }
