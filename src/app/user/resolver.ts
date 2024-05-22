@@ -34,6 +34,9 @@ const extraResolver = {
         where: {
           authorId: parent.id,
         },
+        orderBy: {
+          createdAt: "desc",
+        },
       }),
   },
 };
