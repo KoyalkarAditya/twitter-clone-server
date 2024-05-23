@@ -39,7 +39,7 @@ const extraResolver = {
     followers: async (parent: User) => {
       const result = await prismaClient.follows.findMany({
         where: {
-          follower: {
+          following: {
             id: parent.id,
           },
         },
@@ -74,6 +74,7 @@ const mutations = {
     if (!context.user || !context.user.id) {
       throw new Error("unauthenticated");
     }
+
     await UserService.followUser(context.user.id, to);
     return true;
   },
