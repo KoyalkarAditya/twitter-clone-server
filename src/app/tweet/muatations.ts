@@ -1,3 +1,3 @@
-export const muatations = `#graphql 
+export const mutations = `#graphql 
 createTweet(payload : createTweetData) : Tweet
 `;

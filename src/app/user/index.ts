@@ -1,5 +1,5 @@
 import { types } from "./types";
 import { resolvers } from "./resolver";
 import { queries } from "./queries";
-
-export const User = { types, queries, resolvers };
+import { mutations } from "./mutations";
+export const User = { types, queries, resolvers, mutations };

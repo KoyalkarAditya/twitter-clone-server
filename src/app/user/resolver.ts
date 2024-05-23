@@ -1,6 +1,4 @@
-import axios from "axios";
 import { prismaClient } from "../../clients/db";
-import { JWTService } from "../../services/jwt";
 import { GraphqlContext } from "../../interfaces";
 import { User } from "@prisma/client";
 import UserService from "../../services/user";
@@ -38,6 +36,58 @@ const extraResolver = {
           createdAt: "desc",
         },
       }),
+    followers: async (parent: User) => {
+      const result = await prismaClient.follows.findMany({
+        where: {
+          follower: {
+            id: parent.id,
+          },
+        },
+        include: {
+          follower: true,
+        },
+      });
+      return result.map((el) => el.follower);
+    },
+    following: async (parent: User) => {
+      const result = await prismaClient.follows.findMany({
+        where: {
+          follower: {
+            id: parent.id,
+          },
+        },
+        include: {
+          following: true,
+        },
+      });
+      return result.map((el) => el.following);
+    },
   },
 };
-export const resolvers = { queries, extraResolver };
+
+const mutations = {
+  followUser: async (
+    parent: any,
+    { to }: { to: string },
+    context: GraphqlContext
+  ) => {
+    if (!context.user || !context.user.id) {
+      throw new Error("unauthenticated");
+    }
+    await UserService.followUser(context.user.id, to);
+    return true;
+  },
+  unfollowUser: async (
+    parent: any,
+    { to }: { to: string },
+    context: GraphqlContext
+  ) => {
+    if (!context.user || !context.user.id) {
+      throw new Error("unauthenticated");
+    }
+    await UserService.unFollowUser(context.user.id, to);
+    return true;
+  },
+};
+
+export const resolvers = { queries, extraResolver, mutations };
