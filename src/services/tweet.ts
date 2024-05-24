@@ -9,6 +9,13 @@ export interface CreateTweetPayLoad {
 
 class TweetService {
   public static async createTweet(data: CreateTweetPayLoad) {
+    const rateLimitFlag = await redisClient.get(
+      `RATE_LIMIT:TWEET${data.userId}`
+    );
+    if (rateLimitFlag) {
+      throw new Error("please wait");
+    }
+
     await redisClient.del("ALL_TWEETS");
     const tweet = await prismaClient.tweet.create({
       data: {
@@ -21,6 +28,7 @@ class TweetService {
         },
       },
     });
+    await redisClient.setex(`RATE_LIMIT:TWEET${data.userId}`, 5, 1);
     return tweet;
   }
   public static async getAllTweets() {
