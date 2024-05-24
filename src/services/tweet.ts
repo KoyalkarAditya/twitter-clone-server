@@ -26,7 +26,6 @@ class TweetService {
   public static async getAllTweets() {
     const cachedTweets = await redisClient.get("ALL_TWEETS");
     if (cachedTweets) {
-      console.log(JSON.parse(cachedTweets));
       return JSON.parse(cachedTweets);
     }
     const allTweets = await prismaClient.tweet.findMany({
