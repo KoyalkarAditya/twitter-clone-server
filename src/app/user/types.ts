@@ -10,5 +10,7 @@ type User{
     following : [User]
 
     tweets : [Tweet]
+
+    recommendedUsers : [User]
 }
 `;
