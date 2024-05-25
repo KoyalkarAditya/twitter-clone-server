@@ -10,7 +10,17 @@ import { JWTService } from "../services/jwt";
 export async function initServer() {
   const app = express();
   app.use(bodyParser.json());
-  app.use(cors());
+
+  const cors = require("cors");
+  app.use(
+    cors({
+      origin:
+        "https://twitter-clon-fojdynz42-koyalkar-adityas-projects.vercel.app/",
+      methods: "GET,POST",
+      allowedHeaders: "Content-Type,Authorization",
+    })
+  );
+
   app.get("/", (req, res) => res.status(200).json({ message: "Hello world" }));
   const graphqlServer = new ApolloServer<GraphqlContext>({
     typeDefs: `
