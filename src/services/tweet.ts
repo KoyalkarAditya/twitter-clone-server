@@ -6,7 +6,10 @@ export interface CreateTweetPayLoad {
   imageURL?: string;
   userId: string;
 }
-
+export interface DeleteTweetPayLoad {
+  userId: string;
+  tweetId: string;
+}
 class TweetService {
   public static async createTweet(data: CreateTweetPayLoad) {
     const rateLimitFlag = await redisClient.get(
@@ -43,6 +46,14 @@ class TweetService {
     });
     await redisClient.set("ALL_TWEETS", JSON.stringify(allTweets));
     return allTweets;
+  }
+  public static async deleteTweet(data: DeleteTweetPayLoad) {
+    const { userId, tweetId } = data;
+    await prismaClient.tweet.delete({
+      where: {
+        id: tweetId,
+      },
+    });
   }
 }
 export default TweetService;

@@ -56,6 +56,17 @@ const mutations = {
     });
     return tweet;
   },
+  deleteTweet: async (
+    parent: any,
+    { tweetId }: { tweetId: string },
+    context: GraphqlContext
+  ) => {
+    if (!context.user) {
+      throw new Error("You are not authenticated");
+    }
+    await TweetService.deleteTweet({ tweetId, userId: context.user.id });
+    return true;
+  },
 };
 const extraResolver = {
   Tweet: {
