@@ -73,8 +73,7 @@ class TweetService {
     const tweetExists = await prismaClient.tweet.findUnique({
       where: { id: tweetId },
     });
-    console.log(userExists);
-    console.log(tweetExists);
+
     if (!userExists || !tweetExists) {
       throw new Error("User or Tweet does not exist");
     }
