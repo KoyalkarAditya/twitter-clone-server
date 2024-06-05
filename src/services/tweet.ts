@@ -6,7 +6,7 @@ export interface CreateTweetPayLoad {
   imageURL?: string;
   userId: string;
 }
-export interface DeleteTweetPayLoad {
+export interface UpdateTweetPayLoad {
   userId: string;
   tweetId: string;
 }
@@ -43,11 +43,19 @@ class TweetService {
       orderBy: {
         createdAt: "desc",
       },
+      include: {
+        likes: {
+          include: {
+            user: true,
+          },
+        },
+      },
     });
     await redisClient.set("ALL_TWEETS", JSON.stringify(allTweets));
     return allTweets;
   }
-  public static async deleteTweet(data: DeleteTweetPayLoad) {
+  public static async deleteTweet(data: UpdateTweetPayLoad) {
+    await redisClient.del("ALL_TWEETS");
     const { userId, tweetId } = data;
     await prismaClient.tweet.delete({
       where: {
@@ -55,5 +63,54 @@ class TweetService {
       },
     });
   }
+  public static async updateLike(data: UpdateTweetPayLoad) {
+    await redisClient.del("ALL_TWEETS");
+    const { userId, tweetId } = data;
+    const userExists = await prismaClient.user.findUnique({
+      where: { id: userId },
+    });
+
+    const tweetExists = await prismaClient.tweet.findUnique({
+      where: { id: tweetId },
+    });
+    console.log(userExists);
+    console.log(tweetExists);
+    if (!userExists || !tweetExists) {
+      throw new Error("User or Tweet does not exist");
+    }
+    const existingLike = await prismaClient.like.findFirst({
+      where: {
+        userId,
+        tweetId,
+      },
+    });
+    if (existingLike) {
+      await prismaClient.like.delete({
+        where: {
+          userId_tweetId: {
+            userId,
+            tweetId,
+          },
+        },
+      });
+    } else {
+      await prismaClient.like.create({
+        data: {
+          userId,
+          tweetId,
+        },
+      });
+    }
+  }
+  public static async getLikedUsers(tweetId: string) {
+    {
+      const likes = await prismaClient.like.findMany({
+        where: { tweetId },
+        include: { user: true },
+      });
+      return likes.map((like) => like.user);
+    }
+  }
 }
+
 export default TweetService;

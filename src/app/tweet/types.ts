@@ -8,5 +8,6 @@ type Tweet{
     content : String!
     imageURL : String
     author : User
+    likes : [User!]!
 }
 `;

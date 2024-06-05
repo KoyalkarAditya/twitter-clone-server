@@ -67,10 +67,22 @@ const mutations = {
     await TweetService.deleteTweet({ tweetId, userId: context.user.id });
     return true;
   },
+  updateLike: async (
+    parent: any,
+    { tweetId }: { tweetId: string },
+    context: GraphqlContext
+  ) => {
+    if (!context.user) {
+      throw new Error("You are not authenticated");
+    }
+    await TweetService.updateLike({ tweetId, userId: context.user.id });
+    return true;
+  },
 };
 const extraResolver = {
   Tweet: {
     author: (parent: Tweet) => UserService.getUserById(parent.authorId),
+    likes: async (parent: Tweet) => TweetService.getLikedUsers(parent.id),
   },
 };
 
